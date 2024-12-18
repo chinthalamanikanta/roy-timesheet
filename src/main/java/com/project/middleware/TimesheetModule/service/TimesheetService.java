@@ -7,6 +7,9 @@ import com.project.middleware.TimesheetModule.repository.TimesheetRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -68,7 +71,6 @@ public class TimesheetService {
         timesheet.setId(timesheetDTO.getId());
         timesheet.setEmployeeName(timesheetDTO.getEmployeeName());
         timesheet.setStatus(timesheetDTO.getStatus());
-//        timesheet.setStatus(Timesheet.Status.PENDING);
         timesheet.setManager(timesheetDTO.getManager());
         timesheet.setManagerId(timesheetDTO.getManagerId());
         timesheet.setComments(timesheetDTO.getComments());
@@ -266,45 +268,11 @@ public class TimesheetService {
         return mapToDTO(timesheet);
     }
 
-
-
-    // Method to retrieve timesheets by manager ID and status
-    public List<TimesheetDTO> getDetailsByStatus(String managerId, Timesheet.Status status) {
-
-        // Fetch the list of timesheets for the given manager ID and status from the repository
-        List<Timesheet> timesheets = timesheetRepository.findByManagerIdAndStatus(managerId, status);
-
-        // If no timesheets are found for the given manager ID and status, throw a TimesheetNotFoundException
-        if (timesheets.isEmpty()) {
-            throw new TimesheetNotFoundException(managerId, status);
-        }
-
-        // Convert the list of Timesheet entities to DTOs and return the result
-        return convertToTimesheetDTOs(timesheets);
-    }
-
-
-
     //convert List of Timesheet to List of TimesheetDTO
     public List<TimesheetDTO> convertToTimesheetDTOs(List<Timesheet> timesheets) {
         return timesheets.stream().map(this::mapToDTO).collect(Collectors.toList());
     }
 
-
-    // Method to retrieve timesheets by their status
-    public List<TimesheetDTO> getTimesheetsByStatus(Timesheet.Status status) {
-
-        // Fetch the list of timesheets with the given status from the repository
-        List<Timesheet> timesheets = timesheetRepository.findByStatus(status);
-
-        // If no timesheets are found with the given status, throw a TimesheetNotFoundException
-        if (timesheets.isEmpty()) {
-            throw new TimesheetNotFoundException(status);
-        }
-
-        // Convert the list of Timesheet entities to DTOs and return the result
-        return convertToTimesheetDTOs(timesheets);
-    }
 
 
     // Method to delete a timesheet by its ID
@@ -334,6 +302,29 @@ public class TimesheetService {
             // No timesheets found for the employee, return false or handle accordingly
             return false;
         }
+    }
+
+    public List<TimesheetDTO> getTotalTimesheets(String employeeId, LocalDate startDate, LocalDate endDate) {
+        // Validate the input dates
+        if (startDate == null || endDate == null) {
+            throw new IllegalArgumentException("Start date and end date must not be null.");
+        }
+
+        // Ensure startDate is before or equal to endDate
+        if (startDate.isAfter(endDate)) {
+            throw new IllegalArgumentException("Start date must not be after end date.");
+        }
+
+        // Log the date range for debugging
+        System.out.println("Start Date: " + startDate);
+        System.out.println("End Date: " + endDate);
+
+        // Fetch timesheets for the specified date range
+        List<Timesheet> existingTimesheets = timesheetRepository.findByEmployeeIdAndDateRange(employeeId, startDate, endDate);
+        System.out.println("Fetched Timesheets: " + existingTimesheets);
+
+        // Convert the fetched timesheets to DTOs and return
+        return convertToTimesheetDTOs(existingTimesheets);
     }
 
 }

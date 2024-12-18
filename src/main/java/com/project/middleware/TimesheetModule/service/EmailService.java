@@ -91,7 +91,7 @@ public class EmailService {
 
         // Get the recipient email from the DTO
         String recipientEmail = timesheetDto.getEmailId();
-        recipientEmail="noreply@middlewaretalents.com";
+
 
         // Send the email as HTML content
         sendEmail(recipientEmail, subject, emailContent);
@@ -156,8 +156,7 @@ public class EmailService {
 
         // Get the recipient email from the DTO
         String recipientEmail = timesheetDto.getEmailId();
-        recipientEmail = "noreply@middlewaretalents.com";
-//         String fromEmail="naveen@middlewaretalents.com";
+
         // Send the email as HTML content
         sendEmail(recipientEmail, subject, emailContent);
     }

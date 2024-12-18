@@ -8,10 +8,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "https://talebts-frontend.azurewebsites.net")
 @RequestMapping("/api/timesheets")
 public class TimesheetController {
 
@@ -131,29 +133,6 @@ public class TimesheetController {
         }
     }
 
-
-    // Endpoint to retrieve timesheet details by manager ID and status
-    @GetMapping("/status/{managerId}/{status}")
-    public List<TimesheetDTO> getStatusDetails(
-            @PathVariable String managerId,  // Path variable for the manager's ID
-            @PathVariable Timesheet.Status status) {  // Path variable for the status of the timesheets
-
-        // Call the service to get the timesheet details for the given manager ID and status
-        return timesheetService.getDetailsByStatus(managerId, status);
-    }
-
-
-    // Endpoint to retrieve timesheet details by status
-    @GetMapping("/status/{status}")
-    public List<TimesheetDTO> getDetailsByStatus(@PathVariable Timesheet.Status status) {  // Path variable for the status of the timesheets
-
-        // Call the service to get the timesheet details for the given status
-        return timesheetService.getTimesheetsByStatus(status);
-    }
-
-
-
-
     // Endpoint to delete a timesheet by its ID
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteTimesheet(@PathVariable Long id) {  // Path variable for the timesheet ID to be deleted
@@ -186,6 +165,13 @@ public class TimesheetController {
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); // 404 Not Found
         }
+    }
+
+    @GetMapping("/totalList/employeeId/{employeeId}/startDate/{startDate}/endDate/{endDate}")
+    public List<TimesheetDTO> getTotalTimesheetsByEmployeeId(@PathVariable String employeeId,
+                                                             @PathVariable LocalDate startDate,
+                                                             @PathVariable LocalDate endDate){
+        return timesheetService.getTotalTimesheets(employeeId,startDate,endDate);
     }
 
 
